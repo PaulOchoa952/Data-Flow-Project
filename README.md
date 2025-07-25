@@ -178,6 +178,22 @@ ALTER TABLE cars
 ALTER COLUMN registration TYPE varchar(10);
 ```
 
+## Running Redis with Docker
+
+To start a Redis server using Docker, run:
+
+```
+docker run -d --name my-redis -p 6379:6379 redis:latest
+```
+
+- This will start Redis on port 6379 (the default).
+- The FastAPI app is configured to connect to Redis at `localhost:6379`.
+
+## Using Redis in the FastAPI API
+
+- The API uses Redis to cache responses for GET endpoints (e.g., `/cars/`, `/cars/by_brand/{brand}`) for faster performance.
+- When you update car prices (e.g., with the `/cars/increase_price/{brand}` endpoint), the relevant cache entries are cleared automatically.
+
 ## Building a Secure API with FastAPI, PostgreSQL, and Keycloak
 
 Here’s a high-level step-by-step plan to create a secure API using FastAPI, Docker, K8s, Python, Redis, Keycloak, and Swagger, integrating with your PostgreSQL database and NiFi dataflow:
