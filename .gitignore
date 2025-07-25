@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.env
+.env
+.venv
+venv/
+build/
+dist/
+*.log
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Docker
+*.tar
+*.img
+*.container
+*.pid
+*.sock
+docker-compose.override.yml
+
+# Kubernetes
+*.yaml
+*.yml
+!k8s/*.yaml
+!k8s/*.yml
+
+# PostgreSQL
+*.sql
+*.dump
+*.backup
+
+# Redis
+*.rdb
+*.aof
+
+# Keycloak
+keycloak-data/
+
+# NiFi
+nifi-data/
+
+# Swagger/OpenAPI
+openapi.json
+swagger.json
+
+# System files
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.idea/
+*.iml
+
+# Test/coverage
+.coverage
+htmlcov/
+.tox/
+pytest_cache/
+
+# Pipenv
+Pipfile.lock
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+
+# Pyre
+.pyre/ 
