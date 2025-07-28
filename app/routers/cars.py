@@ -6,6 +6,7 @@ from sqlalchemy import select
 from .. import crud, schemas
 from ..database import get_db
 from app.redis_client import redis_client
+from app.auth import verify_token, require_role
 import json
 from app.exceptions import RedisCacheException
 
@@ -15,7 +16,12 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.Car])
-async def read_cars(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
+async def read_cars(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: AsyncSession = Depends(get_db),
+    token: dict = Depends(verify_token)
+):
     cache_key = f"cars:all:{skip}:{limit}"
     try:
         cached = await redis_client.get(cache_key)
@@ -35,7 +41,11 @@ async def read_cars(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(
     return cars
 
 @router.get("/by_brand/{brand}", response_model=List[schemas.Car])
-async def get_cars_by_brand(brand: str, db: AsyncSession = Depends(get_db)):
+async def get_cars_by_brand(
+    brand: str, 
+    db: AsyncSession = Depends(get_db),
+    token: dict = Depends(verify_token)
+):
     cache_key = f"cars:brand:{brand}"
     try:
         cached = await redis_client.get(cache_key)
@@ -48,7 +58,11 @@ async def get_cars_by_brand(brand: str, db: AsyncSession = Depends(get_db)):
     return cars
 
 @router.get("/by_engtype/{engtype}", response_model=List[schemas.Car])
-async def get_cars_by_engtype(engtype: str, db: AsyncSession = Depends(get_db)):
+async def get_cars_by_engtype(
+    engtype: str, 
+    db: AsyncSession = Depends(get_db),
+    token: dict = Depends(verify_token)
+):
     cache_key = f"cars:engtype:{engtype}"
     try:
         cached = await redis_client.get(cache_key)
@@ -64,7 +78,8 @@ async def get_cars_by_engtype(engtype: str, db: AsyncSession = Depends(get_db)):
 async def increase_price_by_brand(
     brand: str,
     increment: float = Body(..., embed=True),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    token: dict = Depends(require_role("admin"))  # Only admin users can modify prices
 ):
     try:
         await crud.increase_price_by_brand(db, brand, increment)

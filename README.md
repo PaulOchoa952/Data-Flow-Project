@@ -194,6 +194,37 @@ docker run -d --name my-redis -p 6379:6379 redis:latest
 - The API uses Redis to cache responses for GET endpoints (e.g., `/cars/`, `/cars/by_brand/{brand}`) for faster performance.
 - When you update car prices (e.g., with the `/cars/increase_price/{brand}` endpoint), the relevant cache entries are cleared automatically.
 
+## Running Keycloak with Docker
+
+To start a Keycloak server using Docker, run:
+
+```
+docker run -d --name my-keycloak -p 8080:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:latest start-dev
+```
+
+- This will start Keycloak on port 8080.
+- Access the admin console at: http://localhost:8080
+- Login with: `admin` / `admin`
+
+### Keycloak Setup Steps:
+1. Create a new realm (e.g., "cars-api")
+2. Create a new client (e.g., "fastapi-client")
+3. Set client protocol to "openid-connect"
+4. Set Access Type to "confidential"
+5. Add valid redirect URIs (e.g., "http://localhost:8000/*")
+6. Copy the client secret for use in your FastAPI app
+
+curl -X POST http://localhost:8080/realms/cars-api/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password" \
+  -d "client_id=fastapi-client" \
+  -d "client_secret=PocLnDiiEuq0jgSG4eoB3RoBAVzc7mjm" \
+  -d "username=admin" \
+  -d "password=password123"
+  
 ## Building a Secure API with FastAPI, PostgreSQL, and Keycloak
 
 Here’s a high-level step-by-step plan to create a secure API using FastAPI, Docker, K8s, Python, Redis, Keycloak, and Swagger, integrating with your PostgreSQL database and NiFi dataflow:
