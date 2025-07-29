@@ -217,13 +217,7 @@ docker run -d --name my-keycloak -p 8080:8080 \
 5. Add valid redirect URIs (e.g., "http://localhost:8000/*")
 6. Copy the client secret for use in your FastAPI app
 
-curl -X POST http://localhost:8080/realms/cars-api/protocol/openid-connect/token \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "grant_type=password" \
-  -d "client_id=fastapi-client" \
-  -d "client_secret=PocLnDiiEuq0jgSG4eoB3RoBAVzc7mjm" \
-  -d "username=admin" \
-  -d "password=password123"
+curl -X POST http://localhost:8080/realms/cars-api/protocol/openid-connect/token -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=password" -d "client_id=fastapi-client" -d "client_secret=rkwYLI0JwdwnKS4lAIezJBCHQF8KqEXj" -d "username=testuser" -d "password=password123"
   
 ## Building a Secure API with FastAPI, PostgreSQL, and Keycloak
 
