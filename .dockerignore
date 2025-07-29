@@ -21,7 +21,6 @@ coverage.xml
 .DS_Store
 venv/
 .venv/
-.env
 *.md
 tests/
 docker/ 

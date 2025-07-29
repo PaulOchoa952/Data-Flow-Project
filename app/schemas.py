@@ -1,11 +1,13 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class Car(BaseModel):
+    id: Optional[int] = None
     brand: str
     price: float
     body: str
     mileage: int
-    engv: float
+    engv: Optional[float] = None
     engtype: str
     registration: str
     year: int

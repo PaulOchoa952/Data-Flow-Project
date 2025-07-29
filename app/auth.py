@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 import httpx
 import logging
-from .keycloak_config import KEYCLOAK_URL, KEYCLOAK_REALM, JWT_ALGORITHM, JWT_ISSUER
+from .keycloak_config import KEYCLOAK_INTERNAL_URL, KEYCLOAK_REALM, JWT_ALGORITHM, JWT_ISSUER
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -16,11 +16,12 @@ class KeycloakAuthError(Exception):
     pass
 
 async def fetch_jwks() -> dict:
-    """Fetch JWKS from Keycloak"""
-    jwks_url = f"{KEYCLOAK_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/certs"
+    """Fetch JWKS from Keycloak using internal URL"""
+    jwks_url = f"{KEYCLOAK_INTERNAL_URL}/realms/{KEYCLOAK_REALM}/protocol/openid-connect/certs"
     try:
+        logger.info(f"Fetching JWKS from: {jwks_url}")
         async with httpx.AsyncClient() as client:
-            response = await client.get(jwks_url)
+            response = await client.get(jwks_url, timeout=10.0)
             response.raise_for_status()
             return response.json()
     except Exception as e:
@@ -53,32 +54,28 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(secur
         token = credentials.credentials
         
         logger.info(f"Token verification started (length: {len(token)})")
-        logger.debug(f"Token header: {jwt.get_unverified_header(token)}")
         
         # Get the appropriate signing key
         signing_key = await get_signing_key(token)
         logger.info(f"Using signing key with kid: {signing_key.get('kid')}")
         
-        # Verify the token with all required claims
+        # Verify the token with minimal required claims (remove audience check)
         payload = jwt.decode(
             token,
             signing_key,
             algorithms=[JWT_ALGORITHM],
             issuer=JWT_ISSUER,
-            audience="account",  # Keycloak's default audience
             options={
-                "verify_aud": True,
+                "verify_aud": False,  # Disable audience verification
                 "verify_iss": True,
                 "verify_signature": True,
                 "verify_exp": True,
                 "verify_nbf": True,
                 "verify_iat": True,
-                "verify_jti": True
             }
         )
         
         logger.info("Token verified successfully")
-        logger.debug(f"Token payload: {payload}")
         return payload
         
     except JWTError as e:

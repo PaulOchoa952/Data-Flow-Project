@@ -1,0 +1,74 @@
+{
+  "realm": "cars-api",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": false,
+  "rememberMe": false,
+  "verifyEmail": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 30,
+  "clients": [
+    {
+      "clientId": "fastapi-client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "bfee999244ca763250fa4c1f9df53e2ade7f16fe08ad19b3a2ea48e9e3ebedd5",
+      "redirectUris": ["http://localhost:8000/*"],
+      "webOrigins": ["http://localhost:8000"],
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "300",
+        "client.secret.creation.time": "1640995200"
+      },
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "email",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "email",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "email": "test@example.com",
+      "emailVerified": true,
+      "firstName": "Test",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "requiredActions": []
+    }
+  ]
+}
