@@ -18,6 +18,22 @@
   "quickLoginCheckMilliSeconds": 1000,
   "maxDeltaTimeSeconds": 43200,
   "failureFactor": 30,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrative access to API",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "user",
+        "description": "Regular user access",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
   "clients": [
     {
       "clientId": "fastapi-client",
@@ -68,6 +84,7 @@
           "temporary": false
         }
       ],
+      "realmRoles": ["admin", "user"],
       "requiredActions": []
     }
   ]
