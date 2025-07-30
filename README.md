@@ -105,6 +105,86 @@ docker run -it --rm --network=host postgres:latest psql -h localhost -U myuser -
 - To use `psql` from your terminal, install it via Homebrew or Postgres.app.
 - Alternatively, use Docker to run `psql` without installing anything extra.
 
+Here are several ways to open a psql container to access your PostgreSQL database:
+
+## Method 1: Connect to your existing PostgreSQL container
+
+```bash
+# Connect to your running postgres container
+docker exec -it api-postgres-1 psql -U myuser -d mydatabase
+```
+
+## Method 2: Use a temporary psql container
+
+```bash
+# Run a temporary container with psql client
+docker run -it --rm --network api_app-network postgres:latest psql -h postgres -U myuser -d mydatabase
+```
+
+## Method 3: Connect using the container name directly
+
+```bash
+# If your container is named differently, check first:
+docker ps
+
+# Then connect (replace container name if different):
+docker exec -it api-postgres-1 bash
+# Once inside the container:
+psql -U myuser -d mydatabase
+```
+
+## Method 4: One-liner to get into psql directly
+
+```bash
+# Direct connection to your database
+docker exec -it api-postgres-1 psql -U myuser -d mydatabase -c "\l"
+```
+
+## Method 5: Connect from outside Docker (if you have psql installed)
+
+```bash
+# If you have psql installed on your Mac
+psql -h localhost -p 5432 -U myuser -d mydatabase
+```
+
+## Quick Database Inspection Commands
+
+Once you're in psql, try these commands:
+
+```sql
+-- List all databases
+\l
+
+-- Connect to your database
+\c mydatabase
+
+-- List all tables
+\dt
+
+-- Describe the cars table structure
+\d cars
+
+-- Count rows in cars table
+SELECT COUNT(*) FROM cars;
+
+-- Show first 5 cars
+SELECT * FROM cars LIMIT 5;
+
+-- Exit psql
+\q
+```
+
+## Most Common Method
+
+For your setup, this should work:
+
+```bash
+docker exec -it api-postgres-1 psql -U myuser -d mydatabase
+```
+
+When prompted, enter the password: `password`
+
+This connects you directly to the PostgreSQL database that your FastAPI is using! 🚀
 ## Importing Car Data with NiFi and PostgreSQL
 
 ### 1. PostgreSQL Table Structure
@@ -249,6 +329,19 @@ Here’s a high-level step-by-step plan to create a secure API using FastAPI, Do
 ### 6. Dockerize the Application
 - Write a `Dockerfile` for your FastAPI app.
 - Add a `docker-compose.yml` if you want to run FastAPI, PostgreSQL, Redis, and Keycloak together locally.
+
+# Get Token to test on nifi
+
+TOKEN=$(curl -s -X POST http://localhost:8080/realms/cars-api/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=password" \
+  -d "client_id=fastapi-client" \
+  -d "client_secret=bfee999244ca763250fa4c1f9df53e2ade7f16fe08ad19b3a2ea48e9e3ebedd5" \
+  -d "username=testuser" \
+  -d "password=password123" | python3 -c "import sys, json; print(json.load(sys.stdin)['access_token'])")
+
+echo "Copy this into NiFi Authorization field:"
+echo "Bearer $TOKEN"
 
 ### 7. Deploy to Kubernetes
 - Write Kubernetes manifests (Deployment, Service, Ingress, ConfigMap/Secret for env vars).

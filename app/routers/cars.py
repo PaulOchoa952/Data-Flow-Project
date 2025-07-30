@@ -79,14 +79,23 @@ async def increase_price_by_brand(
     brand: str,
     increment: float = Body(..., embed=True),
     db: AsyncSession = Depends(get_db),
-    token: dict = Depends(require_role("admin"))  # Only admin users can modify prices
+    token: dict = Depends(verify_token)  # Change this temporarily
 ):
+    # Debug: Print the token contents
+    #print("DEBUG - Token contents:", token)
+    #print("DEBUG - Realm access:", token.get("realm_access", {}))
+    #print("DEBUG - Roles:", token.get("realm_access", {}).get("roles", []))
+    
+    # Check if admin role exists
+    roles = token.get("realm_access", {}).get("roles", [])
+    if "admin" not in roles:
+        raise HTTPException(status_code=403, detail="Admin role required")
+    
     try:
         await crud.increase_price_by_brand(db, brand, increment)
         # Invalidate relevant cache keys
         await redis_client.delete(f"cars:brand:{brand}")
-        await redis_client.delete("cars:all:0:100")  # Optionally clear the main list cache
+        await redis_client.delete("cars:all:0:100")
     except Exception as e:
         raise RedisCacheException(f"Redis error: {str(e)}")
     return {"message": f"Prices for brand '{brand}' increased by {increment}."}
-    
